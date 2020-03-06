@@ -5,6 +5,7 @@
 // @description  Recupera la data di uscita dei volumi uscenti sulla pagina del calendario di AnimeClick e calcola la spesa totale
 // @author       gboi
 // @match        https://www.animeclick.it/calendario-manga
+// @require      https://code.jquery.com/jquery-3.4.1.min.js
 // @grant        GM_addStyle
 // @supportURL   https://github.com/gboi/Manga-Release-Date-Grabber
 // ==/UserScript==
