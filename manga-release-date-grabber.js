@@ -25,21 +25,25 @@ var myDiv;
     
     addCss();
     
-    var buttonParagraph = $('<p/>', {
+    var listButton = createListButton('#calendario-pagination-div');
+
+    listButton.click(() => printList() );
+
+})();
+
+function createListButton(parentDiv){
+	var buttonParagraph = $('<p/>', {
         id: "button-paragraph"
-    }).appendTo('#calendario-pagination-div');
+    }).appendTo(parentDiv);
     
     var listButton = $('<button/>', {
         id: "list-button",
         class: 'btn btn-default',
         html: 'Miei manga in pagina'
     }).appendTo(buttonParagraph);
-
-    $('#list-button').click(function () {
-        printList();
-    });
-
-})();
+	
+	return listButton;
+}
 
 function addCss(){
     GM_addStyle('#list-button { margin: 10px }');
@@ -51,12 +55,13 @@ function addCss(){
 }
 
 function printMangas(){
-    $('.panel-evento-calendario').each(function(index, box) {
-
-        var title = $(box).find('h5').html();
+    $('.panel-evento-calendario').each(function() {
+        var box = $(this);
+        
+        var title = box.find('h5').html();
         if(want.includes(title.toLowerCase())){
-            var volume = $(box).find('h3').html();
-            var url = $(box).find('a')[0].href;
+            var volume = box.find('h3').html();
+            var url = box.find('a').attr("href");
 
             fetch(url).then((response) => response.text()
                            ).then((result) => {
@@ -95,6 +100,7 @@ function printHeader(){
         html: 'Totale spese',
         class: 'btn btn-default'
     }).appendTo(myDiv);
+	
     totalButton.click(printTotal);
 }
 
