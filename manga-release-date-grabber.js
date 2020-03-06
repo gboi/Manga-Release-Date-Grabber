@@ -64,17 +64,19 @@ function printMangas(){
             var volume = box.find('h3').html();
             var url = box.find('a').attr("href");
 
-            fetch(url).then((response) => response.text()
-                           ).then((result) => {
-                var manga = {
-                    'title': title,
-                    'volume': volume,
-                    'url': url,
-                    'date': getDate(result),
-                    'price': getPrice(result)
-                }
-                printManga(manga, myDiv);
-            });
+			var promise = new Promise((resolve, reject) => {
+				$.get(url, (data) => resolve(data));
+			});
+			promise.then((data) => {
+				var manga = {
+					'title': title,
+					'volume': volume,
+					'url': url,
+					'date': getDate(data),
+					'price': getPrice(data)
+				}
+				printManga(manga, myDiv);
+			});
         }
     });
 }
