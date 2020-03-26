@@ -11,6 +11,7 @@
 // ==/UserScript==
 
 // Lista dei titoli da considerare, in lowercase
+const want = ["vinland saga",
 var want = ["vinland saga",
             "mob psycho 100",
             "dungeon food",
@@ -19,6 +20,7 @@ var want = ["vinland saga",
             "dragon quest saga - l'emblema di roto ii - gli eredi dell'emblema",
             "born to be on air!"];
 
+let myDiv;
 var myDiv;
 
 (function() {
@@ -33,11 +35,13 @@ var myDiv;
 })();
 
 function createListButton(parentDiv){
+	let buttonParagraph = $('<p/>', {
 	var buttonParagraph = $('<p/>', {
         id: "button-paragraph"
     }).appendTo(parentDiv);
     
     var listButton = $('<button/>', {
+    let listButton = $('<button/>', {
         id: "list-button",
         class: 'btn btn-default',
         html: 'Miei manga in pagina'
