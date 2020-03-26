@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Manga Release Date Grabber
 // @namespace    https://github.com/gboi
-// @version      1.0
+// @version      2.0
 // @description  Recupera la data di uscita dei volumi uscenti sulla pagina del calendario di AnimeClick e calcola la spesa totale
 // @author       gboi
 // @match        https://www.animeclick.it/calendario-manga
@@ -23,29 +23,22 @@ let myDiv;
 
 (function() {
     'use strict';
-    
     addCss();
-    
-    var listButton = createListButton('#calendario-pagination-div');
-
-    listButton.click(() => printList() );
-
+    createListButton('#calendario-pagination-div');
 })();
 
 function createListButton(parentDiv){
 	let buttonParagraph = $('<p/>', {
-	var buttonParagraph = $('<p/>', {
         id: "button-paragraph"
     }).appendTo(parentDiv);
-    
-    var listButton = $('<button/>', {
+
     let listButton = $('<button/>', {
         id: "list-button",
         class: 'btn btn-default',
         html: 'Miei manga in pagina'
     }).appendTo(buttonParagraph);
-	
-	return listButton;
+
+	listButton.click(() => print() );
 }
 
 function addCss(){
@@ -57,33 +50,7 @@ function addCss(){
     GM_addStyle('#mie-uscite p.date { font-weight: bold }');
 }
 
-function printMangas(){
-    $('.panel-evento-calendario').each(function() {
-        var box = $(this);
-        
-        var title = box.find('h5').html();
-        if(want.includes(title.toLowerCase())){
-            var volume = box.find('h3').html();
-            var url = box.find('a').attr("href");
-
-			var promise = new Promise((resolve, reject) => {
-				$.get(url, (data) => resolve(data));
-			});
-			promise.then((data) => {
-				var manga = {
-					'title': title,
-					'volume': volume,
-					'url': url,
-					'date': getDate(data),
-					'price': getPrice(data)
-				}
-				printManga(manga, myDiv);
-			});
-        }
-    });
-}
-
-function printList(){
+function print(){
     myDiv = $('#mie-uscite');
     if(myDiv.length!=0){
         return;
@@ -93,36 +60,69 @@ function printList(){
         id: 'mie-uscite'
     }).appendTo('.calendario-mese');
 
-    printHeader();
-    printMangas();
+    Promise.all(getMangaPromises())
+        .then(responses =>
+              Promise.all(responses.map(data => data.text())))
+        .then(response =>{
+        myDiv.append('<h3>Uscite che m\'interessano</h3>');
+        let mangaList = getMangaList(response);
+        mangaList.forEach(manga => printManga(manga));
+        printTotal(mangaList);
+    });
 }
 
-function printHeader(){
-    myDiv.append('<h3>Uscite che m\'interessano</h3>');
+function getMangaPromises(){
+    let mangaListPromise = [];
+    $('.panel-evento-calendario').each(() => {
+        var title = $(this).find('h5').html();
 
-    var totalButton = $('<button/>', {
-        id: "total-button",
-        html: 'Totale spese',
-        class: 'btn btn-default'
-    }).appendTo(myDiv);
-	
-    totalButton.click(printTotal);
+        if(want.includes(title.toLowerCase())){
+            var url = $(this).find('a').attr("href");
+            mangaListPromise.push(fetch(url));
+        }
+    });
+    return mangaListPromise;
+}
+
+function getMangaList(response){
+    let mangaList = [];
+    response.forEach(data => mangaList.push(getManga(data)));
+    return mangaList;
+}
+
+function getManga(data){
+    let manga = {
+        'title': getTitle(data),
+        'volume': getVolume(data),
+        'date': getDate(data),
+        'price': getPrice(data)
+    }
+    return manga;
 }
 
 function printManga(manga){
-    myDiv.append('<h4>' + manga.volume + '</h4>');
-    myDiv.append('<p><span class="date">' + manga.date + '</span> - <span class="price">' + manga.price + '</span> €</p>');
+    myDiv.append('<h4>' + manga.title + ' <span class="volume">' + manga.volume + '</span></h4>');
+    myDiv.append('<p><strong class="date">' + manga.date + '</strong> - <span class="price">' + manga.price + '</span> €</p>');
 }
 
-function printTotal(){
-    if($('#totale-spese').length != 0){
-        return;
-    }
-    var total = 0;
-    $('#mie-uscite .price').each(function(index, price) {
-        total += parseFloat(price.innerHTML.replace(',','.'));
+function printTotal(mangaList){
+    let total = 0;
+    mangaList.forEach((manga) => {
+        total += parsePrice(manga.price);
     });
     myDiv.append('<strong id="totale-spese">Totale:</strong> ' + total.toFixed(2).replace('.',',') + ' €');
+}
+
+function parsePrice(price){
+    return parseFloat(price.replace(',','.'));
+}
+
+function getTitle(data){
+    return useRegex(/<h1 itemprop="name">(.*)&nbsp;/, data);
+}
+
+function getVolume(data){
+    return useRegex(/<h1 itemprop="name">.*\n\D*(\d*)\D*<\/h1>/, data);
 }
 
 function getPrice(data){
@@ -133,9 +133,6 @@ function getDate(data){
     return useRegex(/<strong>Data pubblicazione:<\/strong>&nbsp;(\d*\/\d*)\/\d*/, data);
 }
 
-    var regex = /<strong>Data pubblicazione:<\/strong>&nbsp;(\d*\/\d*)\/\d*/;
-    var date = regex.exec(data)[1];
-    return date;
 function useRegex(pattern, data){
     let regex = pattern.exec(data);
     if(regex != null) return pattern.exec(data)[1];
