@@ -12,7 +12,6 @@
 
 // Lista dei titoli da considerare, in lowercase
 const want = ["vinland saga",
-var want = ["vinland saga",
             "mob psycho 100",
             "dungeon food",
             "bloom into you",
@@ -21,7 +20,6 @@ var want = ["vinland saga",
             "born to be on air!"];
 
 let myDiv;
-var myDiv;
 
 (function() {
     'use strict';
