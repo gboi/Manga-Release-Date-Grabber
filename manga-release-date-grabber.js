@@ -128,13 +128,18 @@ function printTotal(){
 }
 
 function getPrice(data){
-    var regex = /<strong>Prezzo:<\/strong>&nbsp;(\d*,\d*)&nbsp;/;
-    var price = regex.exec(data)[1];
-    return price;
+    return useRegex(/<strong>Prezzo:<\/strong>&nbsp;(\d*,\d*)&nbsp;/, data);
 }
 
 function getDate(data){
+    return useRegex(/<strong>Data pubblicazione:<\/strong>&nbsp;(\d*\/\d*)\/\d*/, data);
+}
+
     var regex = /<strong>Data pubblicazione:<\/strong>&nbsp;(\d*\/\d*)\/\d*/;
     var date = regex.exec(data)[1];
     return date;
+function useRegex(pattern, data){
+    let regex = pattern.exec(data);
+    if(regex != null) return pattern.exec(data)[1];
+    return '';
 }
