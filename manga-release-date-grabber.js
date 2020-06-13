@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Manga Release Date Grabber
 // @namespace    https://github.com/gboi
-// @version      2.1
+// @version      2.2
 // @description  Recupera la data di uscita dei volumi uscenti sulla pagina del calendario di AnimeClick e calcola la spesa totale
 // @author       gboi
 // @match        https://www.animeclick.it/calendario-manga
@@ -14,7 +14,6 @@
 const want = ["vinland saga",
             "mob psycho 100",
             "dungeon food",
-            "bloom into you",
             "boruto",
             "dragon quest saga - l'emblema di roto ii - gli eredi dell'emblema",
             "born to be on air!"];
