@@ -73,11 +73,11 @@ function print(){
 
 function getMangaPromises(){
     let mangaListPromise = [];
-    $('.panel-evento-calendario').each(() => {
-        var title = $(this).find('h5').html();
+    $('.panel-evento-calendario').each((i, el) => {
+        var title = $(el).find('h5').html();
 
         if(want.includes(title.toLowerCase())){
-            var url = $(this).find('a').attr("href");
+            var url = $(el).find('a').attr("href");
             mangaListPromise.push(fetch(url));
         }
     });
