@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Manga Release Date Grabber
 // @namespace    https://github.com/gboi
-// @version      2.0
+// @version      2.1
 // @description  Recupera la data di uscita dei volumi uscenti sulla pagina del calendario di AnimeClick e calcola la spesa totale
 // @author       gboi
 // @match        https://www.animeclick.it/calendario-manga
